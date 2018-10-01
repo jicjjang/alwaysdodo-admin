@@ -2,7 +2,7 @@
   <el-container class="height-full">
     <el-header>
       <nuxt-link to="/admin" class="thumb">DODO</nuxt-link>
-      <el-button type="info">로그아웃</el-button>
+      <el-button type="info" @click="logout">로그아웃</el-button>
     </el-header>
     <el-container>
       <el-aside width="200px">
@@ -21,9 +21,13 @@
 </template>
 <script>
 export default {
-  data() {
-    return {
-    }
+  middleware: [
+    "auth",
+  ],
+  methods: {
+    logout() {
+      this.$auth.logout()
+    },
   },
 }
 </script>
