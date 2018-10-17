@@ -4,7 +4,7 @@
       ref="ruleForm2"
       status-icon
       label-width="120px"
-      @submit="onSubmit"
+      @submit.native.prevent="onSubmit"
     >
       <el-form-item label="Username">
         <el-input v-model="inputUsername" type="text" />
@@ -18,8 +18,8 @@
       </el-form-item>
       <el-form-item>
         <el-button
+          native-type="submit"
           type="primary"
-          @click="onSubmit"
         >Submit</el-button>
       </el-form-item>
     </el-form>
