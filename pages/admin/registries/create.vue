@@ -47,7 +47,7 @@ export default {
       }
       const form = new FormData()
       form.append("attachment", files[0])
-      const response = await this.$axios.post("/attachments", form)
+      const response = await this.$axios.post("/api/attachments", form)
       this.inputValue = `${this.inputValue || ""}${response.data.attachment.path}`
     },
     async createRegistry() {
@@ -67,7 +67,7 @@ export default {
         value = this.inputValue
       }
       try {
-        await this.$axios.post("/registries", {
+        await this.$axios.post("/api/registries", {
           name: this.inputName,
           value,
         })

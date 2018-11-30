@@ -56,7 +56,7 @@
 <script>
 export default {
   async asyncData({app: {$axios}}) {
-    const response = await $axios.get("/registries")
+    const response = await $axios.get("/api/registries")
     return {
       registries: response.data.registries,
     }

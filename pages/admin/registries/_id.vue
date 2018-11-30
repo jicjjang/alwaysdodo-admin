@@ -33,7 +33,7 @@
 <script>
 export default {
   async asyncData({app: {$axios}, params: {id}, error}) {
-    const response = await $axios.get("/registries")
+    const response = await $axios.get("/api/registries")
     id = +id
     const registry = response.data.registries.find((registry) => {
       return registry.id === id
@@ -57,7 +57,7 @@ export default {
       }
       const form = new FormData()
       form.append("attachment", files[0])
-      const response = await this.$axios.post("/attachments", form)
+      const response = await this.$axios.post("/api/attachments", form)
       this.inputValue = `${this.inputValue || ""}${response.data.attachment.path}`
     },
     async updateRegistry() {
@@ -77,7 +77,7 @@ export default {
         value = this.inputValue
       }
       try {
-        await this.$axios.put(`/registries/${this.$route.params.id}`, {
+        await this.$axios.put(`/api/registries/${this.$route.params.id}`, {
           name: this.inputName,
           value,
         })
@@ -91,7 +91,7 @@ export default {
         return
       }
       try {
-        await this.$axios.delete(`/registries/${this.$route.params.id}`)
+        await this.$axios.delete(`/api/registries/${this.$route.params.id}`)
         this.$router.push("/admin")
       } catch (e) {
         alert(e.message || "처리중 에러가 발생하였습니다.")

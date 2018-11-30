@@ -1,7 +1,7 @@
 
 require("dotenv").config(process.cwd())
 
-const AXIOS_BASEURL = process.env.AXIOS_BASEURL || "http://api.alwaysdodo.com"
+const AXIOS_BASEURL = process.env.AXIOS_BASEURL || "https://api.alwaysdodo.com"
 
 module.exports = {
   mode: 'spa',
@@ -50,9 +50,14 @@ module.exports = {
   modules: [
     '@nuxtjs/axios',
     '@nuxtjs/auth',
+    '@nuxtjs/proxy',
   ],
   axios: {
-    baseURL: AXIOS_BASEURL,
+    // baseURL: AXIOS_BASEURL,
+    proxy: true
+  },
+  proxy: {
+    '/api/': { target: AXIOS_BASEURL, pathRewrite: {'^/api/': ''} },
   },
   auth: {
     redirect: {
@@ -63,9 +68,9 @@ module.exports = {
     strategies: {
       local: {
         endpoints: {
-          login: { url: '/auth/login', method: 'post', propertyName: 'token' },
-          user: { url: '/auth/user', method: 'get', propertyName: 'user' },
-          logout: { url: '/auth/logout', method: 'post' },
+          login: { url: '/api/auth/login', method: 'post', propertyName: 'token' },
+          user: { url: '/api/auth/user', method: 'get', propertyName: 'user' },
+          logout: { url: '/api/auth/logout', method: 'post' },
         },
       }
     }
