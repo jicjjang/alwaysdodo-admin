@@ -34,6 +34,7 @@ module.exports = {
   */
   css: [
     'element-ui/lib/theme-chalk/index.css',
+    "~assets/fonts/campton/campton.css",
     "~assets/scss/home.scss",
   ],
 
