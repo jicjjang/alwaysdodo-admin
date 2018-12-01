@@ -18,7 +18,7 @@ export default {
     let adminAuth = false;
 
     try {
-      const response = await $axios.get("/auth/user")
+      const response = await $axios.get("/api/auth/user");
       adminAuth = response.data && response.data.success;
     } catch (e) {}
 
@@ -32,7 +32,7 @@ export default {
     }
   },
   async mounted() {
-    this.email = this.$route.params.email || '';
+    this.email = this.$route.query.email || '';
 
     if (this.adminAuth && this.email) {
       try {
@@ -51,6 +51,7 @@ export default {
       }
     } else if (this.email) {
       alert(`12월 두두를 기대해주세요!`);
+      return 0;
     }
   }
 }
