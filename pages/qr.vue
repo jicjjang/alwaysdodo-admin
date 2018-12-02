@@ -28,16 +28,21 @@ export default {
   },
   data() {
     return {
-      email: ''
+      email: '',
+      code: ''
     }
   },
   async mounted() {
-    this.email = this.$route.query.email || '';
+    this.email = this.$route.query.email || localStorage.getItem('email') || '';
+    this.code = this.$route.query.code || '';
 
-    if (this.adminAuth && this.email) {
+    localStorage.removeItem('email');
+
+    if (this.email) {
       try {
-        const response = await $axios.post("/api/qr/check", {
-          email: this.email
+        const response = await this.$axios.post("/api/qr/check", {
+          email: this.email,
+          code: this.code
         })
 
         if (response.data && response.data.success) {
@@ -46,12 +51,21 @@ export default {
         }
         throw new Error();
       } catch (e) {
+        if (e.response) {
+          if (e.response.status === 403) {
+            alert(`12월 두두를 기대해주세요!`);
+            return 0;
+          } else if (e.response.status === 302 && e.response.data.url !== '') {
+            localStorage.setItem('email', this.email);
+            location.replace(e.response.data.url);
+            return -1;
+          } else if (e.response.status === 500) {
+            console.log(e.response.data.message);
+          }
+        }
         alert(`출석체크에 실패했습니다 ㅠㅠ 다시 한 번 바코드를 찍어주세요.`);
         return -1;
       }
-    } else if (this.email) {
-      alert(`12월 두두를 기대해주세요!`);
-      return 0;
     }
   }
 }
