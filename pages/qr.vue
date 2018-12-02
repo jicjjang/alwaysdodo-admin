@@ -124,13 +124,13 @@ $cyan: #a4d6ef;
     line-height: 1.1;
     color: $white;
     @include media-md() {
-      font-size: 84px;
+      font-size: 80px;
     }
   }
 
   .hello {
-    font-size: 1.5rem;
-      margin-bottom: .75rem;
+    font-size: 1.3rem;
+    margin-bottom: .75rem;
     letter-spacing: .03125rem;
     text-align: center;
     color: $white;
