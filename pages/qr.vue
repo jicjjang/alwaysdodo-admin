@@ -4,7 +4,13 @@
       <div class="container">
         <div class="title en">Until next DODO</div>
         <div class="counter-container">
-          <div class="counter counter-null en">Welcome</div>
+          <div class="counter counter-null en" v-if="remainDays === null || (remainDays !== null && remainDays < 0)">
+            Coming Soon
+          </div>
+          <div class="counter counter-dday en" v-else>
+            <div class="d-day" v-if="remainDays > 0">D-{{ remainDays }}</div>
+            <div class="d-day" v-else>D-Day</div>
+          </div>
         </div>
         <div class="hello en" v-if="email">안녕하세요!<br/><span class="highlight">{{ email }}님</span><br />환영합니다.</div>
         <div class="description">Do what you want to Do! 두두는 미루고 미루던 개인 프로젝트를 끝내기 위한 12시간 해커톤입니다. 두두는 디자이너와 개발자가 해야지 해야지 하다가 시작도 못한 개인 프로젝트를 끝내기 위해 밤을 샜던 3월의 어느 날 시작되었습니다. 개인 블로그, 사이드 프로젝트, 외주 작업, 스터디 등 바쁜 일상에 치여 미루던 일들 누구나 하나쯤은 있잖아요? 구체적이고 완벽한 결과물, 끝내야겠다는 강력한 의지는 필요없습니다. 한 달에 열두시간, 미루던 일 하나 끝내는 해커톤 두두와 함께해요-!</div>
@@ -13,17 +19,28 @@
   </div>
 </template>
 <script>
+import * as moment from "moment"
+import "moment-timezone"
+
 export default {
   async asyncData({app: {$axios}}) {
-    let adminAuth = false;
+    let adminAuth = false
+    const ddayReg = ''
 
     try {
-      const response = await $axios.get("/api/auth/user");
-      adminAuth = response.data && response.data.success;
+      const response = await $axios.get("/api/auth/user")
+      adminAuth = response.data && response.data.success
+    } catch (e) {}
+
+    try {
+      const response = await $axios.get("/api/registries")
+      const registries = response.data.registries
+      ddayReg = registries.find((registry) => registry.name === "dday")
     } catch (e) {}
 
     return {
-      adminAuth
+      adminAuth,
+      dday: ddayReg ? ddayReg.value : undefined
     }
   },
   data() {
@@ -32,39 +49,52 @@ export default {
       code: ''
     }
   },
+  computed: {
+    remainDays() {
+      if (this.dday) {
+        return moment.tz(`${this.dday} 19:30:00`, "Asia/Seoul").diff(new Date(), "day")
+      }
+      return null
+    },
+  },
   async mounted() {
-    this.email = this.$route.query.email || localStorage.getItem('email') || '';
-    this.code = this.$route.query.code || '';
+    this.email = this.$route.query.email || localStorage.getItem('email') || ''
+    this.code = this.$route.query.code || ''
 
-    localStorage.removeItem('email');
+    localStorage.removeItem('email')
 
     if (this.email) {
+      if (this.remainDays === null || (this.remainDays !== null && this.remainDays < 0)) {
+        alert(`출석 체크는 두두 모임 당일에 가능합니다.`)
+        return 0
+      }
+
       try {
-        const response = await this.$axios.post("/api/qr/check", {
+        const result = await this.$axios.post("/api/qr/check", {
           email: this.email,
           code: this.code
         })
 
-        if (response.data && response.data.success) {
-          alert(`DODO에 오신것을 환영합니다!\n출석체크가 완료되었습니다.`);
-          return 1;
+        if (result.data && result.data.success) {
+          alert(`DODO에 오신것을 환영합니다!\n출석체크가 완료되었습니다.`)
+          return 1
         }
-        throw new Error();
+        throw new Error(result)
       } catch (e) {
         if (e.response) {
           if (e.response.status === 403) {
-            alert(`12월 두두를 기대해주세요!`);
-            return 0;
+            alert(`운영진이 아닙니다. 출석 체크를 위해 먼저 운영진 로그인을 해주세요.`)
+            return -1
           } else if (e.response.status === 302 && e.response.data.url !== '') {
-            localStorage.setItem('email', this.email);
-            location.replace(e.response.data.url);
-            return -1;
+            localStorage.setItem('email', this.email)
+            location.replace(e.response.data.url)
+            return -1
           } else if (e.response.status === 500) {
-            console.log(e.response.data.message);
+            console.log(e.response.data.message)
           }
         }
-        alert(`출석체크에 실패했습니다 ㅠㅠ 다시 한 번 바코드를 찍어주세요.`);
-        return -1;
+        alert(`출석체크에 실패했습니다 ㅠㅠ 다시 한 번 바코드를 찍어주세요.`)
+        return -1
       }
     }
   }
@@ -148,6 +178,4 @@ $cyan: #a4d6ef;
     word-break: keep-all;
   }
 }
-
-
 </style>

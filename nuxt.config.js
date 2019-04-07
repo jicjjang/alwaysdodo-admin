@@ -54,11 +54,11 @@ module.exports = {
     '@nuxtjs/proxy',
   ],
   axios: {
-    // baseURL: AXIOS_BASEURL,
-    proxy: true
+    baseURL: AXIOS_BASEURL,
+    proxy: process.env.NODE_ENV !== 'production',
   },
   proxy: {
-    '/api/': { target: AXIOS_BASEURL, pathRewrite: {'^/api/': ''} },
+    '/api/': { target: 'http://localhost:3001', pathRewrite: {'^/api/': ''} },
   },
   auth: {
     redirect: {
